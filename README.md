@@ -185,22 +185,20 @@ Modules include
 - fp_div_synth
 - softmax_engine_top
 
-along with all verification testbenches.
-
 ---
 
 ## Python
 
 Contains
 
-- Golden reference implementation
-- Bit-exact BF16 emulation
-- Error analysis
-- KL divergence evaluation
-- GPT-2 evaluation
-- Perplexity experiments
-- ROM size ablation
-- Accuracy benchmarking
+- Golden reference implementation and evaluation which comprises:
+  - Bit-exact BF16 emulation
+  - Error analysis
+  - KL divergence evaluation
+  - GPT-2 evaluation
+  - Perplexity experiments
+  - ROM size ablation
+  - Accuracy benchmarking
 
 ---
 
@@ -336,6 +334,41 @@ This work demonstrates that
 - Exact Base-2 decomposition enables a hardware-friendly implementation.
 - ROM lookup + barrel shift replace iterative CORDIC without sacrificing model accuracy.
 - The resulting design significantly improves area and power while preserving numerical behavior.
+
+---
+
+## Running the Python Evaluation
+
+The Python evaluation consists of two files:
+
+- `softmax_kernel_golden_reference.py` – Implements the bit-exact golden reference model of the online softmax engine.
+- `evaluation.py` – Runs functional verification, accuracy evaluation, and generates the reported metrics.
+
+### Directory Structure
+
+Ensure both files are placed in the **same directory**:
+
+```
+python/
+├── evaluation.py
+└── softmax_kernel_golden_reference.py
+```
+
+### Running
+
+From within the `python/` directory, execute:
+
+```bash
+python evaluation.py
+```
+
+or, depending on your Python installation,
+
+```bash
+python3 evaluation.py
+```
+
+The script automatically imports `softmax_kernel_golden_reference.py` and performs the complete evaluation workflow.
 
 ---
 
