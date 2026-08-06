@@ -1,8 +1,9 @@
 """
-fp_softmax_kernel.py
-Vectorized BF16/FP32 Online Softmax Kernel -- Base-2 Shift-LUT Exponential.
+Golden reference implementation
+softmax_kernel.py
+Vectorized BF16/FP32 Online Softmax Kernel :  Base-2 Shift-LUT Exponential.
 
-Mirrors ver01 RTL pipeline:
+Mirrors RTL pipeline:
     bf16_compare.sv  -> running max (m, BF16) + new_max_flag
     bf16_delta.sv    -> |m_old - m_new| magnitude
     shift_lut_exp.sv -> 32-entry Q1.11 ROM + barrel shift, base-2 exp approx
@@ -124,19 +125,14 @@ class BF16SoftmaxLayer:
         return x_fp32.to(torch.bfloat16)
 
     def fp_online_softmax(self, x_float_seq):
-        """
-        x_float_seq: FP32 tensor, shape [..., N] (arbitrary leading batch dims).
-        Returns:
-            probs:      FP32 tensor, shape [..., N]
-            sat_events: int, total shift_lut_exp saturation events (Pass 1 + Pass 2)
-        """
+    
         device = x_float_seq.device
         rom = self.rom.to(device)
 
         x_fp32 = x_float_seq.to(torch.float32)
         seq_len = x_fp32.shape[-1]
 
-        # ---- Pass 1: streaming m (BF16) / l (FP32) recurrence ----
+        # Pass 1: streaming m (BF16) / l (FP32) recurrence 
         m_curr = self._to_bf16(x_fp32[..., 0])
         l_curr = torch.ones_like(x_fp32[..., 0])  # l_0 = 1.0 (FP32)
 
@@ -165,7 +161,7 @@ class BF16SoftmaxLayer:
             l_curr = l_curr * r + n_term
             m_curr = m_new
 
-        # ---- Pass 2: vectorized numerator over the full sequence ----
+        # Pass 2: vectorized numerator over the full sequence 
         m_final_fp32 = m_curr.to(torch.float32)
         delta_final = torch.abs(x_fp32 - m_final_fp32.unsqueeze(-1))
         num, sat_final = shift_lut_exp_vectorized(delta_final, rom)
