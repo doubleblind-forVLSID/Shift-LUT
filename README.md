@@ -48,24 +48,7 @@ The repository contains:
 │   ├── evaluation/
 │   ├── pytorch_validation/
 │   └── experiments/
-│
-├── fpga/
-│   ├── vivado_project/
-│   ├── constraints/
-│   ├── reports/
-│   └── waveforms/
-│
-├── asic/
-│   ├── genus/
-│   ├── innovus/
-│   ├── reports/
-│   └── layouts/
-│
-├── docs/
-│   ├── figures/
-│   ├── paper/
-│   └── presentation/
-│
+
 └── README.md
 ```
 
