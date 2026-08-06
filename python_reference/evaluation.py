@@ -1,14 +1,14 @@
 """
-perplexity_eval.py
+evaluation.py
 GPT-2 Perplexity / KL-divergence evaluation for the BF16/FP32 shift-LUT
 online softmax kernel (ShiftAttention). Three conditions:
 
-  1. Baseline FP32       -- torch.nn.functional.softmax, unmodified
-  2. FP32 Online         -- algorithmic online-softmax recurrence (sanity check,
-                             should reproduce baseline PPL to numerical precision)
-  3. BF16/FP32 shift-LUT -- BF16SoftmaxLayer, RTL-matched kernel
+  1. Baseline FP32 :        torch.nn.functional.softmax, unmodified
+  2. FP32 Online   :        algorithmic online-softmax recurrence (sanity check,
+                            should reproduce baseline PPL to numerical precision)
+  3. BF16/FP32 shift-LUT :  BF16SoftmaxLayer, RTL-matched kernel
 
-Metrics collected (per context):
+Metrics collected :
   - Perplexity table (stride=512, ctx=1024)
   - Sequence-length sensitivity sweep (ctx=128/256/512/1024, non-overlapping)
   - Per-head KL divergence (12x12 for GPT-2-small) -> CSV + heatmap + worst-5 table
