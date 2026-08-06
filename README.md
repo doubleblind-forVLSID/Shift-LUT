@@ -44,7 +44,7 @@ The repository contains:
 │   └── bf16_compare/
 │
 ├── python/
-│   ├── golden_model/
+│   ├── softmax_kerenl_golden_reference/
 │   ├── evaluation/
 
 └── README.md
