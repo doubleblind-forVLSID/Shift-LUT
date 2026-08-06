@@ -80,28 +80,26 @@ The answer is **yes**.
 
 Since the exponent entering FlashAttention is always bounded and non-positive,
 
-\[
-e^{-\delta}
-=
-2^{-\delta\log_2 e}
-\]
+$$
+e^{-\delta} = 2^{-\delta \log_2 e}
+$$
 
 The exponent naturally separates into
 
-\[
-z=k+f
-\]
+$$
+z = k + f
+$$
 
 allowing
 
-\[
-2^{-z}=2^{-k}\times2^{-f}
-\]
+$$
+2^{-z} = 2^{-k} \times 2^{-f}
+$$
 
 where
 
-- integer component → barrel shift
-- fractional component → ROM lookup
+- **Integer component** → Barrel Shift
+- **Fractional component** → 32-entry ROM Lookup
 
 No iterative refinement is required.
 
