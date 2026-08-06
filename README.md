@@ -35,19 +35,17 @@ The repository contains:
 ```
 .
 ├── rtl/
-│   ├── shift_lut/
-│   ├── cordic/
+│   ├── shift_lut_exp/
 │   ├── fp32_mac/
 │   ├── fp_div_synth/
-│   ├── accumulator/
-│   ├── top/
-│   └── testbenches/
+│   ├── accumulator_update/
+│   ├── softmax_engine_top/
+│   └── bf16_delta/
+│   └── bf16_compare/
 │
 ├── python/
 │   ├── golden_model/
 │   ├── evaluation/
-│   ├── pytorch_validation/
-│   └── experiments/
 
 └── README.md
 ```
