@@ -86,7 +86,7 @@ def patch_gpt2_softmax(mode, tracker, fp_layer=None):
         else:
             p_out = baseline_p
 
-        # --- Track KL Divergence ---
+        #  Track KL Divergence 
         if mode in ["fp32_online", "fixed_point"]:
             P = baseline_p.double()
             Q_dist = torch.clamp(p_out.double(), 1e-15, 1.0)
@@ -147,11 +147,7 @@ def evaluate_perplexity(model, encodings, stride=512, ctx_len=1024, device='cuda
 
 
 def run_sanity_check():
-    """
-    Verifies that all-negative real logits are not hijacked by masked
-    positions, and that masking works via natural shift_lut_exp saturation
-    (no MASK_FILL sentinel required).
-    """
+   
     print("\n--- Running Pre-Evaluation Sanity Check ---")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     fp_layer = BF16SoftmaxLayer()
@@ -241,12 +237,12 @@ def main():
     dataset = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="test")
     encodings = tokenizer("\n\n".join(dataset["text"]), return_tensors="pt").input_ids
 
-    # --- 1. Baseline Evaluation ---
+    # 1. Baseline Evaluation 
     print("\n--- Running Baseline (Standard FP32 Softmax) ---")
     base_ppl, base_time = evaluate_perplexity(model, encodings, stride=512, ctx_len=1024, device=device)
     print(f"Baseline PPL: {base_ppl:.4f} | Time: {base_time:.2f}s")
 
-    # --- 2. FP32 Online Softmax Evaluation (sanity check: should ~= baseline) ---
+    #  2. FP32 Online Softmax Evaluation (sanity check: should ~= baseline) 
     print("\n--- Running Algorithmic FP32 Online Softmax (sanity check) ---")
     tracker_fp32 = make_tracker(num_layers, num_heads)
     with patch_gpt2_softmax("fp32_online", tracker_fp32):
@@ -257,7 +253,7 @@ def main():
 
     print(f"FP32 Online PPL: {fp32_ppl:.4f} | Time: {fp32_time:.2f}s")
 
-    # --- 3. BF16/FP32 Shift-LUT Softmax Evaluation (headline number) ---
+    # 3. BF16/FP32 Shift-LUT Softmax Evaluation (headline number)
     print(f"\n--- Running BF16/FP32 Shift-LUT Softmax [32-entry ROM, RTL-matched] ---")
     fp_layer = BF16SoftmaxLayer(rom_bits=args.rom_bits)
 
@@ -283,7 +279,7 @@ def main():
     print("These correspond to masked/causal positions (correct behaviour, not errors) --")
     print("no MASK_FILL sentinel was needed; masking falls out of natural saturation.")
 
-    # --- Output Summary Table ---
+    # Output Summary Table 
     print("\n" + "=" * 85)
     print(f" SUMMARY TABLE: GPT-2 WIKITEXT-2 PERPLEXITY (N=1024, BF16/FP32, ROM={1<<args.rom_bits} entries)")
     print("=" * 85)
@@ -295,7 +291,7 @@ def main():
     print(f"{'3. BF16/FP32 Shift-LUT':<24} | {fp_ppl:<12.4f} | {overall_kl_mean:<12.2e} | {overall_kl_max:<12.2e} | {total_saturations:<12} | {fp_time:<8.2f}s")
     print("=" * 85)
 
-    # --- Output CSV ---
+    # Output CSV 
     csv_file = "phase2_results.csv"
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -305,7 +301,7 @@ def main():
                 writer.writerow([L, H, final_kl_mean[L, H], final_kl_max[L, H]])
     print(f"-> Saved per-layer/head KL divergence breakdown to {csv_file}")
 
-    # --- Worst 5 heads table ---
+    #  Worst 5 heads table
     flat_idx = np.argsort(final_kl_max, axis=None)[::-1][:5]
     print("\n--- Worst 5 Heads (by Max KL) ---")
     print(f"{'Rank':<6}{'Layer':<8}{'Head':<8}{'Max_KL':<14}{'Mean_KL':<14}")
@@ -316,7 +312,7 @@ def main():
     print(f"\nWorst head overall: Layer {worst_L}, Head {worst_H} "
           f"(Phase 2 Q(10,16) baseline found L4H11 -- compare against this run)")
 
-    # --- KL heatmap ---
+    #  KL heatmap 
     plt.figure(figsize=(8, 6.5))
     plt.imshow(final_kl_max, cmap='inferno', aspect='auto')
     plt.colorbar(label='Max KL Divergence')
@@ -330,7 +326,7 @@ def main():
     plt.savefig('kl_heatmap.png', dpi=300)
     print("-> Saved 'kl_heatmap.png'")
 
-    # --- Sequence Length Sensitivity Sweep (non-overlapping: stride == ctx) ---
+    #  Sequence Length Sensitivity Sweep (non-overlapping: stride == ctx) 
     print(f"\n--- Running Sequence Length Sensitivity Sweep ---")
     sweep_configs = [(128, 128), (256, 256), (512, 512), (1024, 1024)]
     sweep_ppls_bf16 = []
